@@ -1,0 +1,6 @@
+[project]
+name = MrMeta.github.io
+locale = ko_KR
+
+[servers.ghpages]
+target = ghpages+https://MrMeta/MrMeta.github.io
