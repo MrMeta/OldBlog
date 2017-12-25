@@ -4,12 +4,12 @@ cache:
   directories:
     - $HOME/.cache/pip
     - $HOME/.cache/lektor/builds
+branches:
+  only: src
 install:
 - pip install --upgrade pip setuptools wheel
 - pip install --upgrade git+https://github.com/lektor/lektor.git@master#egg=Lektor
 script: "lektor build"
 deploy:
-    provider: script
-    script: lektor deploy ghpages
-    on:
-        branch: src
+  provider: script
+  script: lektor deploy ghpages
