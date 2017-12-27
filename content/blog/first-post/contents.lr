@@ -1,9 +1,9 @@
 title: Hello Website
 ---
-pub_date: 2017-12-25
+pub_date: 2017-12-25 15:19:53
 ---
 author: MrMeta
 ---
 body:
 
-This is an example blog post.  Not much here but that's not the point :)
+- This is an example blog post.  Not much here but that's not the point :)
