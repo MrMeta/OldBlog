@@ -2,5 +2,9 @@
 {% from "macros/blog.html" import render_blog_post %}
 {% block title %}{{ this.title }}{% endblock %}
 {% block body %}
-  {{ render_blog_post(this) }}
+<div class="post">
+  <h1 class="post-title">{{ this.title }}</h1>
+  <span class="post-date">{{ this.pub_date }}</span>
+  {{ this.body }}
+</div>
 {% endblock %}
