@@ -4,6 +4,17 @@
 <div class="post">
   <h1 class="post-title">{{ this.title }}</h1>
   <span class="post-date">{{ this.pub_date|datetimeformat('YYYY-MM-dd HH:mm') }}</span>
+  {% if this.tags %}
+  <ul>
+    {% for t in this.tags -%}
+      <li>
+        <a href="{{ ('/blog@tag/' ~ t.lower())|url }}">
+          All posts tagged {{ t }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
   {{ this.body }}
 </div>
 {% endblock %}
