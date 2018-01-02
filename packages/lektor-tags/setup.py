@@ -15,7 +15,7 @@ setup(
             'tags = lektor_tags:TagsPlugin',
         ]
     },
-    data_files=[('templates', ['templates/tag.html'])],
+    # data_files=[('templates', ['templates/tag.html'])],
     include_package_data=True,
     # Make sure we get a real path for lektor_tags_default_template.html
     zip_safe=False,
