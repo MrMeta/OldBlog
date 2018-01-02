@@ -4,6 +4,3 @@ locale = ko_KR
 
 [servers.ghpages]
 target = ghpages+https://MrMeta/MrMeta.github.io
-
-[packages]
-lektor-tags = 0.1
