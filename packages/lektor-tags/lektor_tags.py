@@ -30,7 +30,7 @@ class TagPage(VirtualSourceObject):
 
     @property
     def path(self):
-        return build_url([self.parent.path, '@tag', self.tag])
+        return build_url([self.plugin.get_dest_path(), '@tag', self.tag])
 
     @property
     def url_path(self):
@@ -104,7 +104,7 @@ class TagsPlugin(Plugin):
 
             for tag in self.get_all_tags(source):
                 page = TagPage(source, tag)
-                url_path = url_exp.evaluate(pad, this=page, values={'tag': tag})
+                url_path = url_exp.evaluate(pad, values={'tag': tag})
                 page.set_url_path(url_path)
                 yield page
 
@@ -129,8 +129,19 @@ class TagsPlugin(Plugin):
 
         return p
 
-    def get_url_path_expression(self):
+    def get_dest_path(self):
+        d = self.get_config().get('dest')
+        if not d:
+            raise RuntimeError('Set the "dest" option in %s'
+                               % self.config_filename)
+
+        return d
+
+    def get_url_path_expression2(self):
         return self.get_config().get('url_path', DEFAULT_URL_PATH_EXP)
+
+    def get_url_path_expression(self):
+        return self.get_config().get('url_path', self.get_dest_path() + 'tag/{{ tag }}')
 
     def get_template_filename(self):
         filename = self.get_config().get('template')
