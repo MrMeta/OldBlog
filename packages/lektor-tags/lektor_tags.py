@@ -87,7 +87,7 @@ class TagsPlugin(Plugin):
             if not self.has_config():
                 return
 
-            if node.path == self.get_parent_path() and len(pieces) == 1:
+            if node.path == self.get_dest_path() and len(pieces) == 1:
                 return TagPage(node, pieces[0])
 
         @self.env.generator

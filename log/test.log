@@ -1,0 +1,21 @@
+INFO:werkzeug: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with fsevents reloader
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 131-531-711
+INFO:werkzeug:127.0.0.1 - - [04/Jan/2018 23:06:11] "GET /blog/test-page2/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Jan/2018 23:06:20] "GET /static/poole.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Jan/2018 23:06:20] "GET /static/lanyon.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Jan/2018 23:06:20] "GET /static/syntax.css HTTP/1.1" 200 -
+INFO:werkzeug: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with fsevents reloader
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 131-531-711
+DEBUG:root:enter tag_source_path_resolver()
+INFO:werkzeug:127.0.0.1 - - [04/Jan/2018 23:13:52] "GET / HTTP/1.1" 200 -
+DEBUG:root:node.path:/, self.get_dest_path():/, pieces:['test']
+DEBUG:root:enter tag_source_path_resolver()
+DEBUG:root:node.path:/, self.get_dest_path():/, pieces:['second']
+INFO:werkzeug:127.0.0.1 - - [04/Jan/2018 23:15:35] "GET /static/poole.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Jan/2018 23:15:35] "GET /static/lanyon.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Jan/2018 23:15:35] "GET /static/syntax.css HTTP/1.1" 200 -
+DEBUG:root:enter tag_source_path_resolver()
