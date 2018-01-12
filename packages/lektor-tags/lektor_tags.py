@@ -172,6 +172,8 @@ class TagsPlugin(Plugin):
             if parent.path == self.get_dest_path() and len(pieces) == 1:
                 return TagPage(parent, pieces[0])
             elif parent.path == self.get_dest_path() and len(pieces) == 0:
+                if not TagsPlugin.root_page:
+                    return TagRootPage(parent)
                 return TagsPlugin.root_page
 
         @self.env.generator
