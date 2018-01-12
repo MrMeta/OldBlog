@@ -124,7 +124,6 @@ class TagsPlugin(Plugin):
         self.env.add_build_program(TagPage, TagPageBuildProgram)
         self.env.add_build_program(TagRootPage, TagPageBuildProgram)
 
-        # TODO: seperate TagRootPage from TagPage
         @self.env.urlresolver
         def tag_resolver(parent, url_path):
             """Resolves TagPage that matches url_path.
@@ -139,17 +138,21 @@ class TagsPlugin(Plugin):
                 return
 
             u = build_url([parent.url_path] + url_path, trailing_slash=True)
+            return TagsPlugin.url_map.get(u)
 
-            if u in TagsPlugin.url_map:
-                return TagsPlugin.url_map.get(u)
-            elif u == TagsPlugin.root_page.url_path:
+        @self.env.urlresolver
+        def tag_root_resolver(parent, url_path):
+            if not self.has_config():
+                return
+
+            u = build_url([parent.url_path] + url_path, trailing_slash=True)
+            if u == TagsPlugin.root_page.url_path:
                 return TagsPlugin.root_page
-
             return None
 
         @self.env.virtualpathresolver('tag')
-        def tag_source_path_resolver(parent, pieces):
-            """Resolves TagPage that matches the virtual path.
+        def tag_and_root_virtual_path_resolver(parent, pieces):
+            """Resolves Virtual source object(TagPage or TagRootPage) that matches the virtual path.
 
             This function is usually called when a path that includes the virtual marker(@)
             is converted to url by template's 'url' filter.
@@ -160,6 +163,7 @@ class TagsPlugin(Plugin):
 
             Example:
                 if virtual path is '/blog/@tag/test', then 'parent' is '/blog', 'pieces' is ['test'].
+                if virtual path is '/@tag/', then 'parent' is '/', 'pieces' is [].
             """
             if not self.has_config():
                 return
@@ -195,8 +199,17 @@ class TagsPlugin(Plugin):
                 page.set_url_path(url_path)
                 yield page
 
-            parent = source.pad.get(self.get_dest_path())
-            page = TagRootPage(parent)
+        @self.env.generator
+        def generate_tag_root_page(source):
+            if not self.has_config():
+                return
+
+            dest_path = self.get_dest_path()
+            if source.path != dest_path:
+                return
+
+            dest = source.pad.get(self.get_dest_path())
+            page = TagRootPage(dest)
             TagsPlugin.root_page = page
             yield page
 
