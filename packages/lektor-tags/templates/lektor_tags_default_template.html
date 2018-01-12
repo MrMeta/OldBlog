@@ -1,6 +1,3 @@
-{% extends "layout.html" %}
-{% block title %}Tag: {{ this.tag }}{% endblock %}
-{% block body %}
 <h1>Tag: {{ this.tag }} ({{ this.num_of_items }})</h1>
 <h1>Items:</h1>
 <ul>
@@ -10,4 +7,3 @@
     <li><em>No items.</em></li>
   {% endfor %}
 </ul>
-{% endblock %}
