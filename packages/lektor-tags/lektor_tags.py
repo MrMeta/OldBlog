@@ -77,12 +77,9 @@ class TagRootPage(VirtualSourceObject):
 
     @property
     def tags(self):
-        # TODO: write code to get tag_list
-        tag_list = [
-            ('test1', '/tag/test1/', 3),
-            ('test2', '/tag/test2/', 2),
-            ('test3', '/tag/test3/', 4),
-        ]
+        tag_list = []
+        for url_path, tag in self.plugin.url_map.items():
+            tag_list.append((tag.tag, url_path, len(tag.items.all())))
 
         return sorted(tag_list, key=lambda x: x[2], reverse=True)
 
