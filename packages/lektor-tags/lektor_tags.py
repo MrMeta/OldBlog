@@ -30,6 +30,10 @@ class TagPage(VirtualSourceObject):
         return items_exp.evaluate(self.pad, this=self, values={'tag': self.tag})
 
     @property
+    def num_of_items(self):
+        return len(self.items.all())
+
+    @property
     def path(self):
         return build_url([self.plugin.get_dest_path(), '@tag', self.tag])
 
