@@ -63,18 +63,68 @@ class TagPageBuildProgram(BuildProgram):
                                       this=self.source)
 
 
+# TODO: find better name than TagRootPage
+class TagRootPage(VirtualSourceObject):
+    def __init__(self, parent):
+        """construct TagRootPage
+
+        Args:
+            parent:     Source object that is parent of TagRootPage
+        """
+        VirtualSourceObject.__init__(self, parent)
+        self.plugin = parent.pad.env.plugins['tags']
+        self.i_want_to_live = self.pad
+
+    @property
+    def tags(self):
+        # TODO: write code to get tag_list
+        tag_list = [
+            ('test1', '/tag/test1/', 3),
+            ('test2', '/tag/test2/', 2),
+            ('test3', '/tag/test3/', 4),
+        ]
+
+        return sorted(tag_list, key=lambda x: x[2], reverse=True)
+
+    @property
+    def path(self):
+        return build_url([self.plugin.get_dest_path(), '@tag'])
+
+    @property
+    def url_path(self):
+        return build_url([self.plugin.get_dest_path(), 'tag'])
+
+    @property
+    def template_name(self):
+        return self.plugin.get_root_template_filename()
+
+
+class TagRootPageBuildProgram(BuildProgram):
+    def produce_artifacts(self):
+        self.declare_artifact(
+            posixpath.join(self.source.url_path, 'index.html'),
+            sources=list(self.source.iter_source_filenames()))
+
+    def build_artifact(self, artifact):
+        artifact.render_template_into(self.source.template_name,
+                                      this=self.source)
+
+
 class TagsPlugin(Plugin):
     name = u'blog-posts'
     description = u'Lektor customization just for emptysqua.re.'
     generated = False
     url_map = {}            # key: url_path, value: TagPage
     reverse_url_map = {}    # key: TagPage's path, value: url_path
+    root_page = None
 
     def on_setup_env(self, **extra):
         pkg_dir = pkg_resources.resource_filename('lektor_tags', 'templates')
         self.env.jinja_env.loader.searchpath.append(pkg_dir)
         self.env.add_build_program(TagPage, TagPageBuildProgram)
+        self.env.add_build_program(TagRootPage, TagPageBuildProgram)
 
+        # TODO: seperate TagRootPage from TagPage
         @self.env.urlresolver
         def tag_resolver(parent, url_path):
             """Resolves TagPage that matches url_path.
@@ -89,7 +139,13 @@ class TagsPlugin(Plugin):
                 return
 
             u = build_url([parent.url_path] + url_path, trailing_slash=True)
-            return TagsPlugin.url_map.get(u)
+
+            if u in TagsPlugin.url_map:
+                return TagsPlugin.url_map.get(u)
+            elif u == TagsPlugin.root_page.url_path:
+                return TagsPlugin.root_page
+
+            return None
 
         @self.env.virtualpathresolver('tag')
         def tag_source_path_resolver(parent, pieces):
@@ -110,6 +166,8 @@ class TagsPlugin(Plugin):
 
             if parent.path == self.get_dest_path() and len(pieces) == 1:
                 return TagPage(parent, pieces[0])
+            elif parent.path == self.get_dest_path() and len(pieces) == 0:
+                return TagsPlugin.root_page
 
         @self.env.generator
         def generate_tag_pages(source):
@@ -136,6 +194,11 @@ class TagsPlugin(Plugin):
                 url_path = url_exp.evaluate(pad, values={'dest_path': self.get_dest_path(), 'tag': tag})
                 page.set_url_path(url_path)
                 yield page
+
+            parent = source.pad.get(self.get_dest_path())
+            page = TagRootPage(parent)
+            TagsPlugin.root_page = page
+            yield page
 
     def get_all_tags(self, parent):
         exp = Expression(self.env, self.get_tags_expression())
@@ -175,6 +238,13 @@ class TagsPlugin(Plugin):
             return filename
 
         return 'lektor_tags_default_template.html'
+
+    def get_root_template_filename(self):
+        filename = self.get_config().get('root_template')
+        if filename:
+            return filename
+
+        return 'lektor_tags_root_default_template.html'
 
     def get_tag_field_name(self):
         return self.get_config().get('tags_field', 'tags')

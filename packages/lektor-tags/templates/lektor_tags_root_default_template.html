@@ -1,0 +1,8 @@
+This is lektor-tags root page
+<ul>
+    {% for tag, url_path, post_count in this.tags %}
+    <li>
+        <a href="{{ url_path }}">{{ tag }} ({{ post_count }})</a>
+    </li>
+    {% endfor %}
+</ul>
