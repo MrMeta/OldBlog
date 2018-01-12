@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block title %}Tags{% endblock %}
+{% block body %}
+<h1>Tags</h1>
+<ul>
+    {% for tag, url_path, post_count in this.tags %}
+    <li>
+        <a href="{{ url_path }}">{{ tag }} ({{ post_count }})</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}ㄱ,
