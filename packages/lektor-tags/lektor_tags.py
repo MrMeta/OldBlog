@@ -9,7 +9,7 @@ from lektor.sourceobj import VirtualSourceObject
 from lektor.utils import build_url, bool_from_string
 
 DEFAULT_ITEMS_QUERY = 'this.parent.children.filter(F.tags.contains(tag))'
-DEFAULT_URL_PATH_EXP = '{{ this.parent.url_path }}tag/{{ tag }}'
+DEFAULT_URL_PATH_EXP = '{{ dest_path }}tag/{{ tag }}'
 
 
 def _ensure_slash(s):
@@ -25,6 +25,7 @@ class TagPage(VirtualSourceObject):
 
     @property
     def items(self):
+        """Pages that have tag"""
         items_exp = Expression(self.pad.env, self.plugin.get_items_expression())
         return items_exp.evaluate(self.pad, this=self, values={'tag': self.tag})
 
@@ -41,14 +42,14 @@ class TagPage(VirtualSourceObject):
                 return ''
             raise
 
-    def set_url_path(self, url_path):
-        with_slash = _ensure_slash(url_path)
-        TagsPlugin.url_map[with_slash] = self
-        TagsPlugin.reverse_url_map[self.path] = with_slash
-
     @property
     def template_name(self):
         return self.plugin.get_template_filename()
+
+    def set_url_path(self, url_path):
+        url_path = _ensure_slash(url_path)
+        TagsPlugin.url_map[url_path] = self
+        TagsPlugin.reverse_url_map[self.path] = url_path
 
 
 class TagPageBuildProgram(BuildProgram):
@@ -66,8 +67,8 @@ class TagsPlugin(Plugin):
     name = u'blog-posts'
     description = u'Lektor customization just for emptysqua.re.'
     generated = False
-    url_map = {}
-    reverse_url_map = {}
+    url_map = {}            # key: url_path, value: TagPage
+    reverse_url_map = {}    # key: TagPage's path, value: url_path
 
     def on_setup_env(self, **extra):
         pkg_dir = pkg_resources.resource_filename('lektor_tags', 'templates')
@@ -75,23 +76,51 @@ class TagsPlugin(Plugin):
         self.env.add_build_program(TagPage, TagPageBuildProgram)
 
         @self.env.urlresolver
-        def tag_resolver(node, url_path):
+        def tag_resolver(parent, url_path):
+            """Resolves TagPage that matches url_path.
+
+            This function is usually called when a client requests the url. (uncertain)
+
+            Args:
+                parent:     Source object that has the virtual object as child.
+                url_path
+            """
             if not self.has_config():
                 return
 
-            u = build_url([node.url_path] + url_path, trailing_slash=True)
+            u = build_url([parent.url_path] + url_path, trailing_slash=True)
             return TagsPlugin.url_map.get(u)
 
         @self.env.virtualpathresolver('tag')
-        def tag_source_path_resolver(node, pieces):
+        def tag_source_path_resolver(parent, pieces):
+            """Resolves TagPage that matches the virtual path.
+
+            This function is usually called when a path that includes the virtual marker(@)
+            is converted to url by template's 'url' filter.
+
+            Args:
+                parent:     Source object that has the virtual object as child.
+                pieces:     Rest after '@tag/' (List)
+
+            Example:
+                if virtual path is '/blog/@tag/test', then 'parent' is '/blog', 'pieces' is ['test'].
+            """
             if not self.has_config():
                 return
 
-            if node.path == self.get_dest_path() and len(pieces) == 1:
-                return TagPage(node, pieces[0])
+            if parent.path == self.get_dest_path() and len(pieces) == 1:
+                return TagPage(parent, pieces[0])
 
         @self.env.generator
         def generate_tag_pages(source):
+            """Creates TagPage relative to another page that matches the 'parent' option
+            and has tags field.
+
+            This function is usually called while build.
+
+            Args:
+                source:     All source object
+            """
             if not self.has_config():
                 return
 
@@ -104,9 +133,14 @@ class TagsPlugin(Plugin):
 
             for tag in self.get_all_tags(source):
                 page = TagPage(source, tag)
-                url_path = url_exp.evaluate(pad, values={'tag': tag})
+                url_path = url_exp.evaluate(pad, values={'dest_path': self.get_dest_path(), 'tag': tag})
                 page.set_url_path(url_path)
                 yield page
+
+    def get_all_tags(self, parent):
+        exp = Expression(self.env, self.get_tags_expression())
+        tags = exp.evaluate(parent.pad, values={'parent': parent})
+        return sorted(set(tags))
 
     def has_config(self):
         return not self.get_config().is_new
@@ -121,6 +155,9 @@ class TagsPlugin(Plugin):
 
         return 'parent.children.distinct("%s")' % self.get_tag_field_name()
 
+    def get_url_path_expression(self):
+        return self.get_config().get('url_path', DEFAULT_URL_PATH_EXP)
+
     def get_parent_path(self):
         p = self.get_config().get('parent')
         if not p:
@@ -130,18 +167,7 @@ class TagsPlugin(Plugin):
         return p
 
     def get_dest_path(self):
-        d = self.get_config().get('dest')
-        if not d:
-            raise RuntimeError('Set the "dest" option in %s'
-                               % self.config_filename)
-
-        return d
-
-    def get_url_path_expression2(self):
-        return self.get_config().get('url_path', DEFAULT_URL_PATH_EXP)
-
-    def get_url_path_expression(self):
-        return self.get_config().get('url_path', self.get_dest_path() + 'tag/{{ tag }}')
+        return _ensure_slash(self.get_config().get('dest', self.get_parent_path()))
 
     def get_template_filename(self):
         filename = self.get_config().get('template')
@@ -152,11 +178,6 @@ class TagsPlugin(Plugin):
 
     def get_tag_field_name(self):
         return self.get_config().get('tags_field', 'tags')
-
-    def get_all_tags(self, parent):
-        exp = Expression(self.env, self.get_tags_expression())
-        tags = exp.evaluate(parent.pad, values={'parent': parent})
-        return sorted(set(tags))
 
     def ignore_missing(self):
         return bool_from_string(self.get_config().get('ignore_missing'), False)
