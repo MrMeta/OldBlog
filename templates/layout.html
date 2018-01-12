@@ -47,8 +47,16 @@
             ['/projects', 'Projects'],
             ['/@tag/', 'Tags'],
           ]
-         %}
-        <a class="sidebar-nav-item{% if this.is_child_of(href) %} active{% endif %}" href="{{ href|url }}">{{ title }}</a>
+        %}
+        {# TODO: fix bug differently.. ex) fork letkor, PR to Lektor .. #}
+        <a class="sidebar-nav-item
+          {% if (not this.page_num or not href.startswith('/@'))
+             and this.is_child_of(href) %}
+            active
+          {% endif%}"
+           href="{{ href|url }}">
+        {{ title }}
+        </a>
         {% endfor %}
       </nav>
 
