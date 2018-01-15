@@ -172,6 +172,12 @@ class TagsPlugin(Plugin):
             if parent.path == self.get_dest_path() and len(pieces) == 1:
                 return TagPage(parent, pieces[0])
             elif parent.path == self.get_dest_path() and len(pieces) == 0:
+                # 'lektor server' calls builder.update_all_source_infos() before builder.build_all().
+                # Because update_all_source_infos() creates TagRootPage by self.generate_tag_root_pages()
+                # before build_all(), TagsPlugin.root_page is not None.
+                #
+                # But, 'lektor build' doesn't. Therefore, TagsPlugin.root_page is None.
+                # Below if statement is for this case.
                 if not TagsPlugin.root_page:
                     return TagRootPage(parent)
                 return TagsPlugin.root_page

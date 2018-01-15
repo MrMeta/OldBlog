@@ -9,7 +9,9 @@ branches:
 install:
 - pip install --upgrade pip setuptools wheel
 - pip install --upgrade git+https://github.com/lektor/lektor.git@master#egg=Lektor
-script: "lektor build"
+script:
+- echo "y" | lektor clean
+- lektor build
 deploy:
   provider: script
   script: lektor deploy ghpages
