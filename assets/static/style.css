@@ -1,7 +1,12 @@
 @import 'fonts/nanumbarungothic.css';
+@import 'fonts/D2Coding.css';
 
 body{
-  font-family: 'Nanum Barun Gothic', Helvetica, AppleSDGothic, Arial, sans-serif;
+  	font-family: 'Nanum Barun Gothic', Helvetica, AppleSDGothic, Arial, sans-serif;
+}
+
+.hll pre span{
+  	font-family: Hack, 'D2Coding', monospace;
 }
 
 .post-header{
