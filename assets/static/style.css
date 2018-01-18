@@ -2,7 +2,14 @@
 @import 'fonts/D2Coding.css';
 
 body{
+	font-size: 18px;
   	font-family: 'Nanum Barun Gothic', Helvetica, AppleSDGothic, Arial, sans-serif;
+}
+
+hr{
+	border: 0;
+	border-bottom: 1px dashed #888;
+	margin-bottom: 15px;
 }
 
 .hll pre span{
@@ -11,6 +18,41 @@ body{
 
 .post-header{
     margin-bottom: 40px;
+}
+
+.post-header h1{
+    font-weight: 700;
+}
+
+.post-premise{
+	border-bottom: 1px dotted #aaa;
+	margin-bottom: 1rem;
+	color: #aaa;
+	font-weight: 500;
+}
+
+.post-premise p{
+	margin-bottom: 0.5rem;
+}
+
+.post-body h2{
+	border-bottom: 2px solid #515151;
+	padding-bottom: 5px;
+	margin: 3rem 0 1rem 0;
+	font-weight: 700;
+}
+
+.post-body h3{
+	margin: 2rem 0 1rem 0;
+	font-weight: 700;
+}
+
+.post-body h4{
+	font-weight: 600;
+}
+
+.post-body .footnotes{
+	font-size: 0.9em;
 }
 
 .tags{
