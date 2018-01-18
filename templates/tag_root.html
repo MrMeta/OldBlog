@@ -2,11 +2,11 @@
 {% block title %}Tags{% endblock %}
 {% block body %}
 <h1>Tags</h1>
-<ul>
+<ul class="all-tags">
     {% for tag, url_path, post_count in this.tags %}
     <li>
         <a href="{{ url_path }}">{{ tag }} ({{ post_count }})</a>
     </li>
     {% endfor %}
 </ul>
-{% endblock %}ㄱ,
+{% endblock %}
