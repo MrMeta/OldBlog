@@ -55,6 +55,13 @@ hr{
 	font-size: 0.9em;
 }
 
+.all-tags{
+    -webkit-columns: 2;
+    -moz-columns: 2;
+    columns: 2;
+    list-style: disc inside;
+}
+
 .tags{
     margin: 0;
     padding: 0;

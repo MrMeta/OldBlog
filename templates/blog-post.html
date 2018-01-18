@@ -10,7 +10,7 @@
             <ul class="tags">
             {% for t in this.tags -%}
                 <li>
-                    <a href="{{ ('/@tag/' ~ t.lower())|url }}">
+                    <a href="{{ ('/@tag/' ~ t)|url }}">
                     {{ t }}
                     </a>
                 </li>

@@ -85,7 +85,7 @@ class TagRootPage(VirtualSourceObject):
         for url_path, tag in self.plugin.url_map.items():
             tag_list.append((tag.tag, url_path, len(tag.items.all())))
 
-        return sorted(tag_list, key=lambda x: x[2], reverse=True)
+        return sorted(tag_list, key=lambda x: x[0])
 
     @property
     def path(self):
