@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+    <!-- Enable responsiveness on mobile devices-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+    <title>
+      Bash의 [..]와 [[..]]에 대하여
+    </title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../../../static/poole.css?h=5d3e17fc">
+    <link rel="stylesheet" href="../../../../static/syntax.css?h=3ff20e37">
+    <link rel="stylesheet" href="../../../../static/lanyon.css?h=538254e8">
+    <link rel="stylesheet" href="../../../../static/pygments.css">
+    <link rel="stylesheet" href="../../../../static/style.css?h=96e5dc5a">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
+    <link rel="shortcut icon" href="/public/favicon.ico">
+
+    <!-- RSS -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+  </head>
+
+  <body class="theme-base-0c">
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+         styles, `#sidebar-checkbox` for behavior. -->
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+    <!-- Toggleable sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-item">
+        <p>I always seek Metathought.</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="sidebar-nav-item" href="../../../..//">Home</a>
+        
+        
+        <a class="sidebar-nav-item
+          "
+           href="../../../../about/">
+        About Me
+        </a>
+        
+        
+        <a class="sidebar-nav-item
+          
+            active
+          "
+           href="../../../../blog/">
+        Blog
+        </a>
+        
+        
+        <a class="sidebar-nav-item
+          "
+           href="../../../../tag/">
+        Tags
+        </a>
+        
+      </nav>
+
+      <div class="sidebar-item">
+        <p>
+          &copy; Copyright 2017 by MrMeta.
+        </p>
+      </div>
+    </div>
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="../../../../" title="Home">MrMeta's Dev Blog</a>
+            <small></small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        
+<div class="post">
+    <div class="post-header">
+        <h1 class="post-title">Bash의 [..]와 [[..]]에 대하여</h1>
+        <p class="post-date">2018-01-17 18:50</p>
+        
+        <div>
+            <ul class="tags">
+            <li>
+                    <a href="../../../../tag/Bash/">
+                    Bash
+                    </a>
+                </li>
+            
+            </ul>
+        </div>
+        
+    </div>
+    <div class="post-content">
+        
+        <div class="post-premise">
+            <p>이 포스트는 BSD Bash 3.2 환경에서 작성되었습니다.</p>
+        </div>
+        
+        <div class="post-body">
+            <p>Bash에서 test와 [..]는 기능적으로 완전히 동일합니다.
+주어진 expression이 true로 평가되면 0을, 그렇지 않다면 1을 반환하는 <strong>커맨드</strong> 입니다.</p>
+<p>또한 Bash는 이와 비슷한 용도로 [[..]]도 제공합니다.
+[..]와 마찬가지로 주어진 expression이 true로 평가되면 0을, 그렇지 않다면 1을 반환합니다.
+[[..]]는 [..]의 적절한 번형 정도로 이해할 수 있습니다.
+[..]에 오는 대부분의 expression을 사용할 수 있기 때문입니다.
+예를 들면 다음의 예제에서 [..]는 [[..]]로 완전히 대체할 수 있습니다.</p>
+<div class="hll"><pre><span></span><span class="k">if</span> <span class="o">[</span> -f filename <span class="o">]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;true&quot;</span><span class="p">;</span> <span class="k">else</span> <span class="nb">echo</span> <span class="s2">&quot;false&quot;</span><span class="p">;</span> <span class="k">fi</span>
+
+<span class="nv">fruit</span><span class="o">=</span><span class="s2">&quot;peach&quot;</span>
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$fruit</span> <span class="o">=</span> <span class="s2">&quot;banana&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;true&quot;</span><span class="p">;</span> <span class="k">else</span> <span class="nb">echo</span> <span class="s2">&quot;false&quot;</span><span class="p">;</span> <span class="k">fi</span>
+
+<span class="c1"># ${#fruit}은 문자열 fruit의 길이로 변환되는 expansion입니다.</span>
+<span class="k">if</span> <span class="o">[</span> <span class="si">${#</span><span class="nv">fruit</span><span class="si">}</span> -gt <span class="m">5</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;true&quot;</span><span class="p">;</span> <span class="k">else</span> <span class="nb">echo</span> <span class="s2">&quot;false&quot;</span><span class="p">;</span> <span class="k">fi</span>
+</pre></div>
+<p>위 예제에서 =는 숫자 간 비교를 위한 연산자가 아니라 <strong>문자열 비교를 위한 연산자라는 점을 주의</strong> 해야 합니다.
+&lt;, &gt;, =, !=는 문자열 비교를 위한 연산자이며 두 문자열을 사전 순서대로 비교한 결과를 반환합니다.
+숫자 연산은 -gt, -ge, -lt, -le, -eq, -ne 연산자를 통해 할 수 있습니다.
+<strong>&lt;, &gt; 연산자를 숫자와 함께 사용하면 그 숫자는 문자열로 판단되어 연산이 평가됩니다.
+이는 사용자가 의도한 결과와는 다를 수 있으므로 숫자 연산과 문자열 연산을 구분해서 사용해야 합니다.</strong></p>
+<p>그럼 이제 [..]와 [[..]]의 차이점을 살펴보겠습니다.</p>
+<h2>[..]와 [[..]]의 차이점</h2>
+<h3>1. [..]안에서 &lt;, &gt; 연산자를 사용할 때는 escape나 quoting해야 한다.</h3>
+<p>아래 예제는 "apple"과 "cherry"를 사전 순서로 비교하는 예제입니다.</p>
+<div class="hll"><pre><span></span><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;apple&quot;</span> &gt; <span class="s2">&quot;cherry&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;apple &gt; cherry&quot;</span>
+<span class="k">elif</span> <span class="o">[</span> <span class="s2">&quot;apple&quot;</span> <span class="o">=</span> <span class="s2">&quot;cherry&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;apple = cherry&quot;</span>
+<span class="k">else</span>
+    <span class="nb">echo</span> <span class="s2">&quot;apple &lt; cherry&quot;</span>
+<span class="k">fi</span>
+</pre></div>
+<p>위 예제를 실행해보면 "apple &gt; cherry"가 출력되는 것을 볼 수 있습니다.
+위 설명대로 &lt;, &gt;, = 연산자가 사전 순서대로 문자열을 비교한다면 "apple &lt; cherry"가 출력되었어야 합니다.
+왜 이런 결과가 나왔을까요?</p>
+<p>이 의문을 해결하기 위한 힌트는 위 예제를 실행한 작업 디렉토리에서 찾을 수 있습니다.
+작업 디렉토리에 가보면 cherry 파일이 생성된 것을 확인할 수 있습니다(cherry 파일이 없었을 경우).
+왜 cherry 파일이 생성되었을까요?</p>
+<p>답은 [..]의 동작방식에 있습니다. 이해를 쉽게 하기 위해 위 예제를 test를 이용해 다시 써보겠습니다.</p>
+<div class="hll"><pre><span></span><span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;apple&quot;</span> &gt; <span class="s2">&quot;cherry&quot;</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;apple &gt; cherry&quot;</span>
+<span class="k">elif</span> <span class="nb">test</span> <span class="s2">&quot;apple&quot;</span> <span class="o">=</span> <span class="s2">&quot;cherry&quot;</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;apple = cherry&quot;</span>
+<span class="k">else</span>
+    <span class="nb">echo</span> <span class="s2">&quot;apple &lt; cherry&quot;</span>
+<span class="k">fi</span>
+</pre></div>
+<p>문제가 되는 부분은 바로 <strong>test "apple" &gt; "cherry"</strong> 입니다.
+우리는 예제에서 '&gt;' 문자를 문자열 비교를 위해 사용했지만 사실 '&gt;'는 output redirection이라는 다른 기능을 가지고 있습니다.
+위 예제에서 '&gt;'가 output redirection으로 동작했기 떄문에 cherry라는 파일이 생긴 것입니다.
+또한 '&gt;'와 "cherry"가 redirection을 위해 사용되기 때문에 test는 "apple"만을 인자로 받아 0(true)을 반환하게 됩니다.
+그래서 "apple &gt; cherry"가 출력되게 된 것입니다.</p>
+<p>따라서 위와 같은 동작을 막기 위해서는 [..](test)에 문자열 비교를 위한 &lt;, &gt; 연산자를 넘겨줄 때 아래와 같이 escape나 quoting해야 합니다.</p>
+<div class="hll"><pre><span></span><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;apple&quot;</span> <span class="se">\&gt;</span> <span class="s2">&quot;cherry&quot;</span><span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+...
+
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;apple&quot;</span> <span class="s2">&quot;&gt;&quot;</span> <span class="s2">&quot;cherry&quot;</span><span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+...
+</pre></div>
+<p>[..]와 반대로 [[..]]를 사용할 때는 아래와 같이 &lt;, &gt; 연산자에 대해 escape나 quoting을 해줄 필요가 없습니다.</p>
+<div class="hll"><pre><span></span><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;apple&quot;</span> &gt; <span class="s2">&quot;cherry&quot;</span><span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+...
+</pre></div>
+<p>[[..]] 안에서 escape나 quoting을 해줄 필요가 없는 이유는 [[..]]가 [..]와 다르게 커맨드가 아니라 키워드이기 때문입니다.
+[..]은 expression을 공백문자로 구분해 쪼개어 각각 입력받는 일반적인 커맨드인 반면, [[..]]은 expression 그 자체를 가지고 평가합니다.</p>
+<h3>2. [[..]]안에 있는 expression에는 word splitting과 pathname expansion(filename expansion)이 일어나지 않는다.</h3>
+<p>아래 스크립트는 변수의 값이 문자열과 같은지를 판단하는 예제입니다.</p>
+<div class="hll"><pre><span></span><span class="nv">sentence</span><span class="o">=</span><span class="s2">&quot;Bash is Bourne-again shell.&quot;</span>
+
+<span class="c1"># correct result</span>
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$sentence</span> <span class="o">=</span> <span class="s2">&quot;Bash is Bourne-again shell.&quot;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Two strings are equal.&quot;</span>
+<span class="k">fi</span>
+
+<span class="c1"># raise error [: too many arguments</span>
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$sentence</span> <span class="o">=</span> <span class="s2">&quot;Bash is Bourne-again shell.&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Two strings are equal.&quot;</span>
+<span class="k">fi</span>
+</pre></div>
+<p>위 예제를 실행시켜보면 [[..]]을 사용한 if에서는 "Two strings are equal."가 출력되고,
+[..]을 사용한 if에서는 [: too many arguments 에러가 발생한 것을 알 수 있습니다.</p>
+<p>word splitting이 발생하지 않는 [[..]]에서는 $sentence가 "Bash is Bourne-again shell." 그 자체로 변환되기 때문에 원하는 결과가 나옵니다.
+하지만 [..]에서는 word splitting이 발생하기 떄문에 문자열은 "Bash" "is" "Bourne-again" "shell."이라는 각각의 문자열로 분리되고
+이 문자열들이 모두 [..]의 argument로 들어가게 됩니다. 따라서 too many arguments 에러가 발생하게 되는 것이죠.</p>
+<p>[..]를 사용했을 때 word splitting이 발생하는 문제를 해결하기 위해서는 $sentence를 quoting해주면 됩니다.</p>
+<div class="hll"><pre><span></span><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$sentence</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;Bash is Bourne-again shell.&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Two strings are equal.&quot;</span>
+<span class="k">fi</span>
+</pre></div>
+<h3>3. [[..]]에서는 문자열 연산에서 정규식을 사용할 수 있다.</h3>
+<p>[[..]]에서 == 연산자를 사용하면 문자열이 주어진 패턴에 매치되는지를 평가하여 그 여부에 따라 0 또는 1을 리턴합니다. 아래처럼 사용하면 됩니다.</p>
+<div class="hll"><pre><span></span><span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;Apple&quot;</span> <span class="o">==</span> A__ <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;true&quot;</span><span class="p">;</span> <span class="k">fi</span>
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$var</span> <span class="o">==</span> A* <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;true&quot;</span><span class="p">;</span> <span class="k">fi</span>
+</pre></div>
+<p>아래와 같이 사용하면 의도한 결과를 낼 수 없습니다.</p>
+<div class="hll"><pre><span></span><span class="c1"># = 연산자로는 정규식 매칭을 할 수 없습니다.</span>
+<span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;Apple&quot;</span> <span class="o">=</span> A* <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;true&quot;</span><span class="p">;</span> <span class="k">fi</span>
+
+<span class="c1"># [..]로는 정규식 매칭을 할 수 없습니다.</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;Apple&quot;</span> <span class="o">==</span> A* <span class="o">]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;true&quot;</span><span class="p">;</span> <span class="k">fi</span>
+
+<span class="c1"># 정규식은 쿼우팅되면 안됩니다.</span>
+<span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;Apple&quot;</span> <span class="o">==</span> <span class="s2">&quot;A*&quot;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;true&quot;</span><span class="p">;</span> <span class="k">fi</span>
+</pre></div>
+<p>또한, [[..]]에서 !=도 패턴 매칭을 사용합니다.</p>
+<h3>4. 조건을 잇는 논리 연산자 AND, OR를 나타태는 방법이 다르다.</h3>
+<p>[..]와 [[..]]에서는 각 조건을 AND 혹은 OR할 수 있는데, 그 방법이 약간 상이합니다.</p>
+<div class="hll"><pre><span></span><span class="k">if</span> <span class="o">[</span> <span class="si">${#</span><span class="nv">var</span><span class="si">}</span> -ge <span class="m">5</span> -a <span class="si">${#</span><span class="nv">var</span><span class="si">}</span> -lt <span class="m">10</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;correct&quot;</span><span class="p">;</span> <span class="k">fi</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$filename</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;log&quot;</span> -o <span class="s2">&quot;</span><span class="nv">$filename</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;Log&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;correct&quot;</span><span class="p">;</span> <span class="k">fi</span>
+
+<span class="c1"># 위 스크립트와 같은 결과를 반환합니다.</span>
+<span class="k">if</span> <span class="o">[[</span> <span class="si">${#</span><span class="nv">var</span><span class="si">}</span> -ge <span class="m">5</span> <span class="o">&amp;&amp;</span> <span class="si">${#</span><span class="nv">var</span><span class="si">}</span> -lt <span class="m">10</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;correct&quot;</span><span class="p">;</span> <span class="k">fi</span>
+<span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;</span><span class="nv">$filename</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;log&quot;</span> <span class="o">||</span> <span class="s2">&quot;</span><span class="nv">$filename</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;Log&quot;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;correct&quot;</span><span class="p">;</span> <span class="k">fi</span>
+</pre></div>
+<h2>산술연산을 조금 더 편하게 할 수 없을까?</h2>
+<p>-eq, -gt 등을 통해 산술 연산을 하는 것은 C나 Java같은 다른 프로그래밍 언어에 익숙한 분들에게는 약간은 어색합니다.
+&lt;, &gt; 등 일반적으로 프로그래밍 언어에서 사용하는 방법으로 비교 연산을 하고 싶은 경우에는 다음 예제와 같이 ((..))를 사용하면 됩니다.</p>
+<div class="hll"><pre><span></span><span class="c1"># if [ ${#fruit} -gt 4 ]; then 과 같은 의미를 가지고 있습니다.</span>
+<span class="k">if</span> <span class="o">((</span> <span class="si">${#</span><span class="nv">fruit</span><span class="si">}</span> &gt; <span class="m">4</span> <span class="o">))</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;The length of \&quot;fruit\&quot; is greater than 4&quot;</span>
+<span class="k">fi</span>
+</pre></div>
+<p>또한, [..], [[..]]와는 달리 ((..))에서는 +, - 등 다른 산술 연산도 가능합니다</p>
+<div class="hll"><pre><span></span><span class="k">if</span> <span class="o">((</span> <span class="nv">$applicant</span> &gt; <span class="nv">$capacity</span> * <span class="m">2</span> <span class="o">))</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;The number of applicants far exceeded capacity&quot;</span>
+<span class="k">fi</span>
+</pre></div>
+<h2>정리</h2>
+<ol>
+<li>[..] [[..]]을 사용할 때는 문자열 연산과 숫자 연산에 쓰이는 연산자를 혼동하지 말아야 합니다.</li>
+<li>[..]에서 &lt;, &gt; 연산자를 사용할 때는 escape나 quoting해줘야 합니다. [[..]]에서는 필요없습니다.</li>
+<li>[[..]]에서는 [..]와는 다르게 word splitting과 pathname expansion이 일어나지 않습니다.</li>
+<li>[[..]]에서는 == 연산자를 사용해 문자열이 정규식이 매칭되는지를 평가할 수 있습니다.</li>
+<li>[..], [[..]]은 AND와 OR를 표현하는 방법이 각각 다릅니다.</li>
+<li>수학 기호들(&lt;, &gt;, == 등)을 사용하고 싶거나 산술 연산이 들어가야 하는 경우에는 [..], [[..]] 대신 ((..))를 사용합니다.</li>
+</ol>
+
+        </div>
+    </div>
+</div>
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script>
+      (function(document) {
+        var toggle = document.querySelector('.sidebar-toggle');
+        var sidebar = document.querySelector('#sidebar');
+        var checkbox = document.querySelector('#sidebar-checkbox');
+
+        document.addEventListener('click', function(e) {
+          var target = e.target;
+
+          if(!checkbox.checked ||
+             sidebar.contains(target) ||
+             (target === checkbox || target === toggle)) return;
+
+          checkbox.checked = false;
+        }, false);
+      })(document);
+    </script>
+  </body>
+</html>
