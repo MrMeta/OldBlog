@@ -4,7 +4,7 @@
   <div>
     <span class="post-date">{{ post.pub_date|datetimeformat('YYYY-MM-dd') }}</span>
   </div>
-  {% set DESC_LIMIT = 80 %}
+  {% set DESC_LIMIT = 150 %}
   {% set body_length = post.body.html|striptags|length %}
   {% if body_length >= DESC_LIMIT %}
     {{ (post.body.html|striptags)[:DESC_LIMIT] }} ...

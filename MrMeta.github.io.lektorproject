@@ -2,5 +2,8 @@
 name = MrMeta.github.io
 locale = ko_KR
 
+[packages]
+lektor-markdown-highlighter = 0.2
+
 [servers.ghpages]
 target = ghpages+https://MrMeta/MrMeta.github.io
