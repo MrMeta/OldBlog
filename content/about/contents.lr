@@ -1,7 +1,27 @@
-title: About this Website
+title: About Me
 ---
 body:
 
-This is a website that was made with the Lektor quickstart.
+늙어서도 개발하고 싶은 Meta입니다.
 
-And it does not contain a lot of information.
+## Used Technologies
+
+### Web Frontend
+HTML, CSS, JavaScript/AngularJS, Gulp
+
+### Backend
+Python/Django, Python/Django REST Framework, Nginx
+
+### Database
+MySQL, Oracle
+
+### And..
+Android, Bash
+
+
+## Interests And Likes
+
+- TDD에 관심이 있습니다.
+- Programming Competition에 관심이 있습니다.
+- 언어나 기술의 내부를 들여다 보는 것을 좋아합니다.
+- 수학을 좋아합니다.
