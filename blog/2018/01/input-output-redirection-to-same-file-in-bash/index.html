@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+    <!-- Enable responsiveness on mobile devices-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+    <title>
+      Bash에서 입출력을 한 파일로 동시에 Redirection 하기
+    </title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../../../static/poole.css?h=5d3e17fc">
+    <link rel="stylesheet" href="../../../../static/syntax.css?h=3ff20e37">
+    <link rel="stylesheet" href="../../../../static/lanyon.css?h=538254e8">
+    <link rel="stylesheet" href="../../../../static/pygments.css">
+    <link rel="stylesheet" href="../../../../static/style.css?h=96e5dc5a">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+    <!-- Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
+    <link rel="shortcut icon" href="/public/favicon.ico">
+
+    <!-- RSS -->
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+  </head>
+
+  <body class="theme-base-0c">
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+         styles, `#sidebar-checkbox` for behavior. -->
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+    <!-- Toggleable sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-item">
+        <p>I always seek Metathought.</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="sidebar-nav-item" href="../../../..//">Home</a>
+        
+        
+        <a class="sidebar-nav-item
+          "
+           href="../../../../about/">
+        About Me
+        </a>
+        
+        
+        <a class="sidebar-nav-item
+          
+            active
+          "
+           href="../../../../blog/">
+        Blog
+        </a>
+        
+        
+        <a class="sidebar-nav-item
+          "
+           href="../../../../tag/">
+        Tags
+        </a>
+        
+      </nav>
+
+      <div class="sidebar-item">
+        <p>
+          &copy; Copyright 2017 by MrMeta.
+        </p>
+      </div>
+    </div>
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="../../../../" title="Home">MrMeta's Dev Blog</a>
+            <small></small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        
+<div class="post">
+    <div class="post-header">
+        <h1 class="post-title">Bash에서 입출력을 한 파일로 동시에 Redirection 하기</h1>
+        <p class="post-date">
+            2018-01-26 23:07
+            
+        </p>
+        
+        <div>
+            <ul class="tags">
+            <li>
+                    <a href="../../../../tag/Bash/">
+                    Bash
+                    </a>
+                </li>
+            <li>
+                    <a href="../../../../tag/C/">
+                    C
+                    </a>
+                </li>
+            
+            </ul>
+        </div>
+        
+    </div>
+    <div class="post-content">
+        
+        <div class="post-premise">
+            <p>이 포스트는 GNU bash, version 3.2.57(1)-release 환경에서 작성되었습니다.</p>
+        </div>
+        
+        <div class="post-body">
+            <p>Bash에서 standard I/O은 파일로 redirection될 수 있습니다. 아래와 같이 말이죠.</p>
+<div class="hll"><pre><span></span>cat infile
+<span class="c1"># The sed utility reads the specified files, or the standard input if no files are specified, modifying the input as specified by a list of commands.</span>
+
+<span class="c1"># the를 The로 바꾸는 커맨드</span>
+sed <span class="s1">&#39;s/the/The/g&#39;</span> &lt; infile &gt; outfile
+</pre></div>
+<p>워 스크립트에서는 stdin을 infile에 연결하여 sed에 대한 입력으로 사용하고, stdout을 outfile에 연결하여 sed의 출력이 outfile에 저장됩니다.</p>
+<p>저는 여기서 '결과를 infile 자체에 저장하고 싶은데 과연 입출력을 한 파일로 동시에 redirection 할 수 있을까?' 라는 의문이 들었습니다.
+이 포스트는 이 질문에서 시작합니다.</p>
+<h2>단순하게 시도하기</h2>
+<p>처음으로 시도한 방법은 가장 직관적인 방법이었습니다.</p>
+<div class="hll"><pre><span></span>sed <span class="s1">&#39;s/the/The/g&#39;</span> &lt; infile &gt; infile
+cat infile          <span class="c1"># 아무 것도 출력되지 않습니다.</span>
+</pre></div>
+<p>하지만 예상한 바와는 다르게 infile에는 아무 것도 출력되지 않은 것을 알 수 있습니다.</p>
+<h2>왜 안 될까?</h2>
+<p>이를 설명하기 위해서는 Bash에 대해 조금은 깊숙히 다룰 필요가 있습니다.</p>
+<p>Bash는 C로 작성된 프로그램입니다.<sup class="footnote-ref" id="fnref-1"><a href="#fn-1">1</a></sup> 이는 redirection 처리가 내부적으로 C에 의해 이루어진다는 의미입니다.
+위 sed 커맨드는 내부적으로 대략 이렇게 처리된다고 할 수 있습니다.</p>
+<div class="hll"><pre><span></span><span class="c1">// infile을 &quot;w&quot;모드로 open 합니다.</span>
+<span class="kt">int</span> <span class="n">fd1</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">&quot;infile&quot;</span><span class="p">,</span> <span class="n">O_TRUNC</span><span class="o">|</span><span class="n">O_WRONLY</span><span class="o">|</span><span class="n">O_CREAT</span><span class="p">);</span>
+<span class="c1">// infile을 &quot;r&quot;모드로 open 합니다.</span>
+<span class="kt">int</span> <span class="n">fd2</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">&quot;infile&quot;</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="p">);</span>
+
+<span class="c1">// 파일 디스크립터 0을 표준 입력에서 fd1로 변경합니다.</span>
+<span class="n">dup2</span><span class="p">(</span><span class="n">fd1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="c1">// 파일 디스크립터 1을 표준 출력에서 fd2로 변경합니다.</span>
+<span class="n">dup2</span><span class="p">(</span><span class="n">fd2</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+<span class="c1">// sed 실행</span>
+<span class="c1">// sed 내에서의 입출력은 각각 파일 디스크립터 0, 1로 이뤄지므로</span>
+<span class="c1">// 결국 아래 코드는 infile로부터 입력을 받아 infile로 출력하게 됩니다.</span>
+<span class="n">sed</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+</pre></div>
+<p>그래서 왜 안 되는 걸까요? 위 코드를 우리가 실행해 볼 수 있는 수준으로 단순화해보겠습니다.</p>
+<p>우선 testfile이라는 파일을 만들고 텍스트를 넣습니다.</p>
+<div class="hll"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;Hello World&#39;</span> &gt; testfile
+</pre></div>
+<p>그 후 같은 디렉터리에서 아래 C 코드를 작성, 컴파일한 후 실행해 봅시다.</p>
+<div class="hll"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="c1">// fopen()은 내부적으로 open()을 호출합니다.</span>
+    <span class="kt">FILE</span><span class="o">*</span> <span class="n">in</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;testfile&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">);</span>
+    <span class="kt">FILE</span><span class="o">*</span> <span class="n">out</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;testfile&quot;</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">);</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+
+    <span class="c1">// 위 코드에서 파일 디스크립터 0, 1을 변경하는 부분을 제거하고</span>
+    <span class="c1">// 직접 파일을 열어 읽고 쓰는 식으로 바꿨습니다.</span>
+    <span class="c1">// testfile로부터 &quot;Hello World&quot;라는 문자열을 읽어 buf에 저장합니다.</span>
+    <span class="n">fgets</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">in</span><span class="p">);</span>
+    <span class="c1">// &quot;Hello World&quot;를 testfile에 씁니다.</span>
+    <span class="n">fputs</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">out</span><span class="p">);</span>
+
+    <span class="n">fclose</span><span class="p">(</span><span class="n">in</span><span class="p">);</span>
+    <span class="n">fclose</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<p>위 코드를 실행해 보면 infile이 비어있던 것처럼 testfile도 비어있음을 확인할 수 있습니다.
+<strong>즉, 위 sed 커맨드가 생각대로 작동되지 않은 이유는 C의 open() 함수의 작동 방식 때문이었다는 것을 알 수 있습니다.</strong></p>
+<p>자, open()은 system call이므로 이제 문제가 OS로 확장되었습니다.
+이번 포스트에서는 OS까지 다룰 생각이 전혀 없으므로
+<strong>'open() system call을 이용해 한 파일을 "r"모드와 "w"모드로 동시에 열면 문제가 생기는구나'</strong>
+정도로 이해하고 넘어가려고 합니다.</p>
+<h2>다른 방법으로 시도하기</h2>
+<p>제가 원하는 결과를 얻기 위해선 어떻게 해야 할까요?</p>
+<p>구글링 해본 결과 bash의 그룹 커맨드 { }와 rm을 이용하면 standard I/O을 하나의 파일로 동시에 redirection할 수 있다는 사실을 발견했습니다.
+아래와 같이 말이죠.</p>
+<div class="hll"><pre><span></span><span class="o">{</span> rm -f infile<span class="p">;</span> sed <span class="s1">&#39;s/the/The/g&#39;</span> &gt; infile <span class="p">;</span><span class="o">}</span> &lt; infile
+cat infile
+</pre></div>
+<p>위 커맨드는 제가 원하던 결과를 출력합니다. 하지만 rm 커맨드를 사용하는 부분이 조금 찝찝합니다.
+위 커맨드를 실행하기 전과 후의 infile가 서로 같은 파일이라면 rm 커맨드는 실행되지 않은 걸까요?
+정말 입력에 사용한 infile과 출력에 사용한 infile이 같은 파일인지 한 번 확인해보겠습니다.</p>
+<div class="hll"><pre><span></span><span class="c1"># infile의 inode 값을 출력합니다.</span>
+<span class="c1"># 여기서 inode 값은 파일에 대한 식별자라고 할 수 있습니다.</span>
+stat -f %i infile
+<span class="o">{</span> rm -f infile<span class="p">;</span> sed <span class="s1">&#39;s/the/The/g&#39;</span> &gt; infile <span class="p">;</span><span class="o">}</span> &lt; infile
+stat -f %i infile
+</pre></div>
+<p>위 커맨드를 실행해보면 2번째 커맨드를 실행하기 전후 infile의 inode<sup class="footnote-ref" id="fnref-2"><a href="#fn-2">2</a></sup> 값이 변경되었음을 확인할 수 있습니다.
+<strong>즉, 이는 입력은 기존의 infile을 사용했지만, 출력은 이름만 infile인 다른 파일을 사용했다는 것을 의미합니다.</strong></p>
+<p>여기서 눈여겨 볼 점은 그룹 커맨드 안에서 infile이 이미 삭제되었음에도 불구하고 sed에 대한 입력은 여전히 삭제된 infile로 연결되어 있다는 점입니다.</p>
+<h2>왜 될까?</h2>
+<p>위 커맨드가 어떤 순서로 진행되는 지 천천히 살펴보겠습니다.</p>
+<ol>
+<li>그룹 커맨드를 실행하기 전에 input redirection을 먼저 처리합니다. 그룹 커맨드의 입력은 infile로 redirection됩니다.</li>
+<li>rm -f infile이 실행되어 infile이 삭제됩니다.</li>
+<li>infile이 삭제되었음에도 불구하고 sed 커맨드의 입력은 그룹 커맨드 밖에서 redirection했던 infile에서 읽어옵니다.</li>
+<li>sed 커맨드가 실행됩니다.</li>
+<li>sed 커맨드의 출력은 infile로 redirection됩니다. 이 때, infile이라는 파일이 없으므로 새로 생성됩니다.</li>
+</ol>
+<p>3번이 별로 직관적이지 않아 보입니다. C에서는 어떻게 동작할 지 실습을 한 번 해보곘습니다.</p>
+<p>이전과 같이 먼저 testfile을 만들고,</p>
+<div class="hll"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;Hello World&#39;</span> &gt; testfile
+</pre></div>
+<p>아래의 C코드를 작성, 컴파일한 후 실행해 봅시다.</p>
+<div class="hll"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="c1">// fopen()은 내부적으로 open()을 호출합니다.</span>
+    <span class="kt">FILE</span><span class="o">*</span> <span class="n">in</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;testfile&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">);</span>
+    <span class="kt">FILE</span><span class="o">*</span> <span class="n">out</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+
+    <span class="c1">// testfile을 삭제합니다.</span>
+    <span class="n">remove</span><span class="p">(</span><span class="s">&quot;testfile&quot;</span><span class="p">);</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&quot;testfile&quot;</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">);</span>
+
+    <span class="c1">// testfile로부터 &quot;Hello World&quot;라는 문자열을 읽어 buf에 저장합니다.</span>
+    <span class="n">fgets</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">in</span><span class="p">);</span>
+    <span class="c1">// &quot;Hello World&quot;를 testfile에 씁니다.</span>
+    <span class="n">fputs</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">out</span><span class="p">);</span>
+
+    <span class="n">fclose</span><span class="p">(</span><span class="n">in</span><span class="p">);</span>
+    <span class="n">fclose</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<p>실행해 보면 testfile에 "Hello World"가 저장되어 있음을 확인할 수 있습니다. 역시 이 정도의 결론을 내릴 수 있습니다.</p>
+<p><strong>'아, open() system call로 파일을 "r"모드로 열었다면 그 파일을 삭제해도 입력을 처리할 수 있구나'</strong></p>
+<h2>사실...</h2>
+<p>사실 infile 내에서 the를 The로 바꾸는 작업을 sed의 옵션을 사용해서 처리할 수 있습니다. 또한 이렇게 처리하는 것이 더 안전합니다.</p>
+<div class="hll"><pre><span></span><span class="c1"># -i 옵션은 백업 파일을 위한 확장자를 받습니다.</span>
+sed -i.bak <span class="s1">&#39;s/the/The/g&#39;</span> infile
+</pre></div>
+<p>참 멀리 돌아온 것 같은 기분이 드는 건 기분 탓입니다.(...)</p>
+<div class="footnotes">
+<hr>
+<ol><li id="fn-1"><p>GNU Bash source code:  <a href="https://ftp.gnu.org/gnu/bash/">https://ftp.gnu.org/gnu/bash/</a><a href="#fnref-1" class="footnote">&#8617;</a></p></li>
+<li id="fn-2"><p><a href="https://ko.wikipedia.org/wiki/%EC%95%84%EC%9D%B4%EB%85%B8%EB%93%9C">https://ko.wikipedia.org/wiki/%EC%95%84%EC%9D%B4%EB%85%B8%EB%93%9C</a><a href="#fnref-2" class="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+        </div>
+    </div>
+</div>
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script>
+      (function(document) {
+        var toggle = document.querySelector('.sidebar-toggle');
+        var sidebar = document.querySelector('#sidebar');
+        var checkbox = document.querySelector('#sidebar-checkbox');
+
+        document.addEventListener('click', function(e) {
+          var target = e.target;
+
+          if(!checkbox.checked ||
+             sidebar.contains(target) ||
+             (target === checkbox || target === toggle)) return;
+
+          checkbox.checked = false;
+        }, false);
+      })(document);
+    </script>
+  </body>
+</html>
