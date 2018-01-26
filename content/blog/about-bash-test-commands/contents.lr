@@ -2,13 +2,15 @@ title: Bash의 [..]와 [[..]]에 대하여
 ---
 pub_date: 2018-01-17 18:50:00
 ---
+modified_date: 2018-01-26 14:04:00
+---
 author: MrMeta
 ---
 tags:
 
 Bash
 ---
-premise: 이 포스트는 BSD Bash 3.2 환경에서 작성되었습니다.
+premise: 이 포스트는 GNU bash, version 3.2.57(1)-release 환경에서 작성되었습니다.
 ---
 body:
 
