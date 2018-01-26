@@ -93,7 +93,12 @@
 <div class="post">
     <div class="post-header">
         <h1 class="post-title">Bash의 $((..))와 ((..))에 대하여</h1>
-        <p class="post-date">2018-01-18 02:04</p>
+        <p class="post-date">
+            2018-01-18 02:04
+            
+            ( 2018-01-26 14:04 수정 )
+            
+        </p>
         
         <div>
             <ul class="tags">
@@ -110,7 +115,7 @@
     <div class="post-content">
         
         <div class="post-premise">
-            <p>이 포스트는 BSD Bash 3.2 환경에서 작성되었습니다.</p>
+            <p>이 포스트는 GNU bash, version 3.2.57(1)-release 환경에서 작성되었습니다.</p>
         </div>
         
         <div class="post-body">
@@ -173,7 +178,7 @@ shell은 커맨드가 실행되기 전에 $((..))를 괄호 안의 수식 연산
 하지만 ((..))는 수식 연산의 평가 결과가 0이 아닌 경우 exit code로 0을, 0인 경우 exit code로 1을 리턴하고 종료되는 커맨드입니다.
 (exit code는 출력과 다릅니다. 예를 들어 ls은 현재 디렉토리에 포함된 것들을 <strong>출력</strong>하지만 그와는 별개로 커맨드가 종료될 때 숫자로 된 exit code를 <strong>반환</strong>합니다.)</p>
 <p>자, 예제를 통해 자세히 알아보겠습니다.</p>
-<div class="hll"><pre><span></span><span class="nb">echo</span> <span class="k">$((</span> <span class="m">2</span> <span class="o">+</span> <span class="m">5</span> <span class="k">))</span> <span class="c1"># echo 7과 같음</span>
+<div class="hll"><pre><span></span><span class="nb">echo</span> <span class="k">$((</span> <span class="m">2</span> <span class="o">+</span> <span class="m">5</span> <span class="k">))</span> <span class="c1"># echo 7과 같습니다.</span>
 </pre></div>
 <p>$(( 2 + 5 ))는 2+5의 결과 7로 변환되어 결국 echo 7을 실행하는 것과 같습니다.</p>
 <div class="hll"><pre><span></span><span class="k">$((</span> <span class="m">2</span> <span class="o">+</span> <span class="m">5</span> <span class="k">))</span>
@@ -191,7 +196,7 @@ $?은 특수한 파라미터로 바로 전에 실행된 커맨드의 exit code�
 <p>산술 연산의 결과 자체를 사용하고자 할 때는 $((..))를 사용하고,
 (예를 들어 커맨드에 넘겨줄 argument로 산술 연산의 결과를 변수에 저장하지 않고 바로 넘기고 싶을 때)</p>
 <div class="hll"><pre><span></span><span class="nv">var</span><span class="o">=</span><span class="m">5</span>
-touch <span class="k">$((</span> <span class="nv">$var</span> <span class="o">+</span> <span class="m">2</span> <span class="k">))</span> <span class="c1"># 7이라는 빈 파일이 생성된다.</span>
+touch <span class="k">$((</span> <span class="nv">$var</span> <span class="o">+</span> <span class="m">2</span> <span class="k">))</span> <span class="c1"># 7이라는 빈 파일이 생성됩니다.</span>
 </pre></div>
 <p><strong>if에서 산술 비교 연산을 조건으로 사용하고 싶을 때</strong> ((..))를 사용하면 됩니다.</p>
 <div class="hll"><pre><span></span><span class="nv">var1</span><span class="o">=</span><span class="m">1</span>
@@ -199,7 +204,7 @@ touch <span class="k">$((</span> <span class="nv">$var</span> <span class="o">+<
 <span class="k">if</span> <span class="o">((</span> <span class="nv">$var1</span> &gt; <span class="nv">$var2</span> <span class="o">))</span><span class="p">;</span> <span class="k">then</span>
     <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$var1</span><span class="s2"> &gt; </span><span class="nv">$var2</span><span class="s2">&quot;</span>
 <span class="k">else</span>
-    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$var1</span><span class="s2"> &lt;= </span><span class="nv">$var2</span><span class="s2">&quot;</span> <span class="c1"># 1 &lt;= 2가 출력된다.</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$var1</span><span class="s2"> &lt;= </span><span class="nv">$var2</span><span class="s2">&quot;</span> <span class="c1"># 1 &lt;= 2가 출력됩니다.</span>
 <span class="k">fi</span>
 </pre></div>
 <p>변수에 산술 연산의 결과를 저장할 때는 $((..))와 ((..)) 둘 다 사용할 수 있습니다.</p>
